@@ -58,3 +58,59 @@ class MakeWiki:
         self.browser['wpTextbox1'] = '{{subst:Member Bio Template}}'
         self.curr_response = self.browser.submit()
         self.curr_html = self.curr_response.read()
+
+    def edit_template(self, name, form):
+        name = self.clean_name(name)
+        self.open_page('http://wiki.phisigmapi.org/pspwiki/index.php?title=%s&action=edit' % name)
+        self.browser.select_form(name = 'editform')
+        self.browser['wpTextbox1'] = self.get_template_contents(form)
+        self.curr_response = self.browser.submit()
+        self.curr_html = self.curr_response.read()
+
+    def get_template_contents(self, info_dict):
+        ret = """
+        {{Infobox Brother
+        %(infobox)s
+        }}
+        %(info)s
+
+        %(early_frat)s
+
+        %(collegiate_years)s
+
+        %(alumni_years)s
+
+        %(national_involvement)s
+
+        %(bigs_littles)s
+
+        %(other_facts)s
+        [[Category:Members]]
+        [[Category:%(chapter_name)s Members]]
+        [[Category:%(chapter_name)s Chapter]]
+        """
+        d = {}
+        infobox = ''
+        for item in ['name', 'chapter', 'school', 'inducted', 'birth_date', 'majors']:
+            infobox += '| %s = %s' % (item, info_dict['item'])
+        if 'nickname' in info_dict:
+            infobox += '| nickname = %s' % info_dict['nickname']
+        if 'awards' in info_dict:
+            infobox += '| awards = %s' % info_dict['awards']
+        d['infobox'] = infobox
+        info = """'''%s''' (born %s) is a Collegiate Member of [[%s]] at [%s %s].""" %\
+            (info_dict['name'], str(info_dict['birth_date']), info_dict['chapter'], info_dict['school_site'], info_dict['school']) 
+        d['info'] = info
+        if 'early_frat_life' in info_dict:
+            d['early_frat'] = infobox['early_frat_life']
+        if 'collegiate_years' in info_dict:
+            d['collegiate_years'] = infobox['collegiate_years']
+        if 'bigs_littles' in info_dict:
+            d['bigs_littles'] = infobox['bigs_litles']
+        if 'national_involvement' in info_dict:
+            d['national_involvement'] = infobox['national_involvement']
+        if 'other_facts' in info_dict:
+            d['other_facts'] = infobox['other_facts']
+        d['chapter_name'] = info_dict['chapter']
+        ret = ret % d
+        return ret

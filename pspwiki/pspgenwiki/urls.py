@@ -4,7 +4,7 @@ from django.conf.urls.defaults import *
 # from django.contrib import admin
 # admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = patterns('pspgenwiki.views',
     # Example:
     # (r'^pspwiki/', include('pspwiki.foo.urls')),
 
@@ -13,5 +13,5 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     # (r'^admin/', include(admin.site.urls)),
-    (r'^', include('pspgenwiki.urls')),
+    (r'^$', 'index'),
 )
